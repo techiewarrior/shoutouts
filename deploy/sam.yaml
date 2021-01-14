@@ -141,20 +141,6 @@ Resources:
         Variables:
           STATE_MACHINE_ARN: !Ref ShoutoutsStateMachine
 
-  ShoutoutSaverFunction:
-    Type: AWS::Serverless::Function
-    DependsOn: ShoutoutsRole
-    Properties:
-      Role: !GetAtt ShoutoutsRole.Arn
-      CodeUri: ../build/saver.zip
-      Handler: saver
-      Runtime: go1.x
-      Tracing: Active
-      MemorySize: 128
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref ShoutoutsTable
-
   ShoutoutMetricsFunction:
     Type: AWS::Serverless::Function
     DependsOn: ShoutoutsRole
@@ -196,12 +182,6 @@ Resources:
           "TimeoutSeconds": 90,
           "States":
           {
-            "save": {
-              "Type": "Task",
-              "Resource": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${ShoutoutSaverFunction}",
-              "TimeoutSeconds": 30,
-              "Next": "metrics"
-            },
             "metrics": {
               "Type": "Task",
               "TimeoutSeconds": 30,
